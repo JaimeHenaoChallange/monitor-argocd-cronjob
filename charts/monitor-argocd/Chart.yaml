@@ -12,4 +12,4 @@ maintainers:
   - name: Jaime
     email: jaimehenao8126@outlook.com
 sources:
-  - https://github.com/JaimeHenaoChallange/monitor-argocd-opcion1.git
+  - https://github.com/JaimeHenaoChallange/monitor-argocd-cronjob.git

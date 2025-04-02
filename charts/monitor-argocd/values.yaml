@@ -9,7 +9,7 @@ data:
   ARGOCD_SERVER: "http://argocd-server.argocd.svc.cluster.local:80"
 
 image:
-  repository: jaimehenao8126/monitor-argocd-opcion1
+  repository: jaimehenao8126/monitor-argocd
   tag: latest
   pullPolicy: IfNotPresent
 
