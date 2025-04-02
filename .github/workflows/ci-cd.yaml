@@ -42,6 +42,10 @@ jobs:
         echo "${KUBECONFIG}" > kubeconfig
         export KUBECONFIG=$(pwd)/kubeconfig
         kubectl config view
+        kubectl get nodes --kubeconfig=$(pwd)/kubeconfig
+
+    - name: Test Kubernetes Connection
+      run: |
         kubectl get nodes --kubeconfig=$(pwd)/kubeconfig --v=6
 
     - name: Ensure Namespace Exists
