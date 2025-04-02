@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: monitor-argocd-config
+data:
+  SLACK_WEBHOOK_URL: "https://hooks.slack.com/services/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"
+  ARGOCD_USERNAME: "admin"
+  ARGOCD_PASSWORD: "Thomas#1109"
+  ARGOCD_SERVER: "http://argocd-server.argocd.svc.cluster.local:80"
+
+image:
+  repository: jaimehenao8126/monitor-argocd-opcion1
+  tag: latest
+  pullPolicy: IfNotPresent
+
+cronjob:
+  schedule: "*/1 * * * *"  # Change to "*/5 * * * *" for production
+  concurrencyPolicy: "Forbid"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  restartPolicy: OnFailure
+
+resources:
+  limits:
+    cpu: "100m"
+    memory: "128Mi"
+  requests:
+    cpu: "100m"
+    memory: "128Mi"

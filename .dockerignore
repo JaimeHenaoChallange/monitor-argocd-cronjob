@@ -1,0 +1,19 @@
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore virtual environment directories
+venv/
+env/
+
+# Ignore Docker-related files
+Dockerfile
+.dockerignore
+
+# Ignore GitHub workflows
+.github/
+
+# Ignore Helm charts
+charts/

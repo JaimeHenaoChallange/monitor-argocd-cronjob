@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: monitor-argocd
+  labels:
+    app: monitor-argocd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: monitor-argocd
+  template:
+    metadata:
+      labels:
+        app: monitor-argocd
+    spec:
+      serviceAccountName: monitor-argocd-sa
+      containers:
+        - name: monitor-argocd
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: Always
+          command: ["python", "/src/monitor_argocd.py"]
+          env:
+            - name: SLACK_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: slack-webhook-secret
+                  key: webhook-url
+            - name: ARGOCD_USERNAME
+              value: "{{ .Values.argocd.username }}"
+            - name: ARGOCD_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: argocd-secret
+                  key: password
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"

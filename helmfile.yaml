@@ -1,0 +1,11 @@
+releases:
+  - name: monitor-argocd
+    chart: ./charts/monitor-argocd
+    version: 0.1.0
+    values:
+      - ./charts/monitor-argocd/values.yaml
+    installed: true
+    namespace: default
+    wait: true
+    timeout: 300
+    atomic: true

@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: monitor-argocd
+  namespace: default
+  labels:
+    app: monitor-argocd
+spec:
+  schedule: {{ .Values.cronjob.schedule }}
+  concurrencyPolicy: {{ .Values.cronjob.concurrencyPolicy }}
+  successfulJobsHistoryLimit: {{ .Values.cronjob.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.cronjob.failedJobsHistoryLimit }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: monitor-argocd-sa
+          containers:
+          - name: monitor-argocd
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            command: ["python", "/src/monitor_argocd.py"]
+            env:
+            - name: SLACK_WEBHOOK_URL
+              value: {{ .Values.env.SLACK_WEBHOOK_URL | quote }}
+            - name: ARGOCD_USERNAME
+              value: {{ .Values.env.ARGOCD_USERNAME | quote }}
+            - name: ARGOCD_PASSWORD
+              value: {{ .Values.env.ARGOCD_PASSWORD | quote }}
+            - name: ARGOCD_SERVER
+              value: {{ .Values.env.ARGOCD_SERVER | quote }}
+          restartPolicy: {{ .Values.cronjob.restartPolicy }}
+      backoffLimit: 4

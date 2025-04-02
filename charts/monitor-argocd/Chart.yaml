@@ -1,0 +1,15 @@
+apiVersion: v2
+name: monitor-argocd
+description: Helm chart para el CronJob de monitorización de ArgoCD
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - argocd
+  - monitoring
+  - slack
+maintainers:
+  - name: Jaime
+    email: jaimehenao8126@outlook.com
+sources:
+  - https://github.com/JaimeHenaoChallange/monitor-argocd-opcion1.git
