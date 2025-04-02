@@ -48,6 +48,9 @@ jobs:
       run: |
         kubectl get nodes --kubeconfig=$(pwd)/kubeconfig --v=6
 
+    - name: Test Kubernetes connection
+      run: kubectl get nodes --insecure-skip-tls-verify
+
     - name: Ensure Namespace Exists
       run: |
         kubectl get namespace poc || kubectl create namespace poc
