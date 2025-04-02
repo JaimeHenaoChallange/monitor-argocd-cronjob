@@ -44,6 +44,16 @@ jobs:
         export KUBECONFIG=$(pwd)/kubeconfig
         kubectl config view
 
+    - name: Debug KUBECONFIG
+      run: |
+        echo "${KUBECONFIG}" > kubeconfig
+        cat kubeconfig
+        kubectl --kubeconfig=kubeconfig config view
+
+    - name: Test Kubernetes Connection
+      run: |
+        kubectl get nodes
+
     - name: Set up Helm
       uses: azure/setup-helm@v3
 
