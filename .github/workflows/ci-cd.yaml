@@ -35,4 +35,4 @@ jobs:
 
     - name: Deploy to Kubernetes
       run: |
-        helm upgrade --install monitor-argocd charts/monitor-argocd --namespace default
+        helm upgrade --install monitor-argocd charts/monitor-argocd --namespace poc
