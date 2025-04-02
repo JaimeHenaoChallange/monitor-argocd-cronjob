@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: monitor-argocd
-  namespace: default
+  namespace: poc
   labels:
     app: monitor-argocd
 spec:
