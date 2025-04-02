@@ -49,7 +49,7 @@ jobs:
 
     - name: Ensure Namespace Exists
       run: |
-        kubectl get namespace poc --insecure-skip-tls-verify || kubectl create namespace poc --insecure-skip-tls-verify
+        kubectl get namespace poc --kubeconfig=$(pwd)/kubeconfig --insecure-skip-tls-verify || kubectl create namespace poc --kubeconfig=$(pwd)/kubeconfig --insecure-skip-tls-verify
 
     - name: Validate Helm Chart
       run: |
