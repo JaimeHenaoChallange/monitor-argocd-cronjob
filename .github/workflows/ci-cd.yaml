@@ -45,7 +45,7 @@ jobs:
 
     - name: Test Kubernetes Connection
       run: |
-        kubectl get nodes --insecure-skip-tls-verify
+        kubectl get nodes --kubeconfig=$(pwd)/kubeconfig --insecure-skip-tls-verify
 
     - name: Ensure Namespace Exists
       run: |
