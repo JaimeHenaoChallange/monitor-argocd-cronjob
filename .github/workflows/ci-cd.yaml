@@ -40,7 +40,6 @@ jobs:
         KUBECONFIG: ${{ secrets.KUBECONFIG }}
       run: |
         echo "${KUBECONFIG}" > kubeconfig
-        cat kubeconfig  # Verificar el contenido del archivo
         export KUBECONFIG=$(pwd)/kubeconfig
         kubectl config view
 
