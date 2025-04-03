@@ -4,7 +4,7 @@ metadata:
   name: monitor-argocd
   namespace: poc
 spec:
-  project: default
+  project: poc
   source:
     repoURL: https://github.com/JaimeHenaoChallange/monitor-argocd-cronjob.git
     targetRevision: main
