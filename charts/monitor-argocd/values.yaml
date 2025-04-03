@@ -33,3 +33,6 @@ env:
   ARGOCD_USERNAME: "admin"
   ARGOCD_PASSWORD: "Thomas#1109"
   ARGOCD_SERVER: "http://argocd-server.argocd.svc.cluster.local:80"
+
+deployment:
+  enabled: false
