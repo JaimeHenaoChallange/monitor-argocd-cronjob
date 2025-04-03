@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: monitor-argocd
-  namespace: argocd
+  namespace: poc
 spec:
   project: default
   source:

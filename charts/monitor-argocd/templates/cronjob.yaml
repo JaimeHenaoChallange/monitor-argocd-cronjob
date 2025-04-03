@@ -1,33 +1,52 @@
+{{- if .Values.cronjob.enabled }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: monitor-argocd
-  namespace: poc
+  namespace: {{ .Release.Namespace }}
   labels:
     app: monitor-argocd
 spec:
-  schedule: {{ .Values.cronjob.schedule }}
-  concurrencyPolicy: {{ .Values.cronjob.concurrencyPolicy }}
+  schedule: "{{ .Values.cronjob.schedule }}"
+  concurrencyPolicy: "{{ .Values.cronjob.concurrencyPolicy }}"
   successfulJobsHistoryLimit: {{ .Values.cronjob.successfulJobsHistoryLimit }}
   failedJobsHistoryLimit: {{ .Values.cronjob.failedJobsHistoryLimit }}
   jobTemplate:
     spec:
       template:
         spec:
-          serviceAccountName: monitor-argocd-sa
           containers:
           - name: monitor-argocd
             image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-            imagePullPolicy: {{ .Values.image.pullPolicy }}
-            command: ["python", "/src/monitor_argocd.py"]
+            imagePullPolicy: "{{ .Values.image.pullPolicy }}"
             env:
             - name: SLACK_WEBHOOK_URL
-              value: {{ .Values.env.SLACK_WEBHOOK_URL | quote }}
+              valueFrom:
+                configMapKeyRef:
+                  name: monitor-argocd-config
+                  key: SLACK_WEBHOOK_URL
             - name: ARGOCD_USERNAME
-              value: {{ .Values.env.ARGOCD_USERNAME | quote }}
+              valueFrom:
+                configMapKeyRef:
+                  name: monitor-argocd-config
+                  key: ARGOCD_USERNAME
             - name: ARGOCD_PASSWORD
-              value: {{ .Values.env.ARGOCD_PASSWORD | quote }}
+              valueFrom:
+                configMapKeyRef:
+                  name: monitor-argocd-config
+                  key: ARGOCD_PASSWORD
             - name: ARGOCD_SERVER
-              value: {{ .Values.env.ARGOCD_SERVER | quote }}
-          restartPolicy: {{ .Values.cronjob.restartPolicy }}
+              valueFrom:
+                configMapKeyRef:
+                  name: monitor-argocd-config
+                  key: ARGOCD_SERVER
+          restartPolicy: "{{ .Values.cronjob.restartPolicy }}"
+          resources:
+            limits:
+              cpu: "{{ .Values.resources.limits.cpu }}"
+              memory: "{{ .Values.resources.limits.memory }}"
+            requests:
+              cpu: "{{ .Values.resources.requests.cpu }}"
+              memory: "{{ .Values.resources.requests.memory }}"
       backoffLimit: 4
+{{- end }}
