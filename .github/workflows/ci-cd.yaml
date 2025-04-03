@@ -25,39 +25,48 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build-and-push
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up kubectl
-      uses: azure/setup-kubectl@v3
-      with:
-        version: 'v1.26.0'
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
 
-    - name: Authenticate with Kubernetes
-      env:
-        KUBECONFIG: ${{ secrets.KUBECONFIG }}
-      run: |
-        echo "${KUBECONFIG}" > kubeconfig
-        export KUBECONFIG=$(pwd)/kubeconfig
-        kubectl config view
+      - name: Install ngrok
+        run: |
+          curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
+          echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list
+          sudo apt update && sudo apt install ngrok
 
-    - name: Test Kubernetes Connection
-      run: |
-        kubectl get nodes --kubeconfig=$(pwd)/kubeconfig --insecure-skip-tls-verify
+      - name: Authenticate ngrok
+        env:
+          NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+        run: ngrok config add-authtoken $NGROK_AUTH_TOKEN
 
-    - name: Ensure Namespace Exists
-      run: |
-        kubectl get namespace poc --kubeconfig=$(pwd)/kubeconfig --insecure-skip-tls-verify || kubectl create namespace poc --kubeconfig=$(pwd)/kubeconfig --insecure-skip-tls-verify
+      - name: Start ngrok tunnel
+        run: ngrok http 8443 > /dev/null &
+      
+      - name: Get ngrok public URL
+        run: |
+          sleep 5
+          curl -s http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[0].public_url' > ngrok_url.txt
+        id: ngrok
 
-    - name: Validate Helm Chart
-      run: |
-        helm lint charts/monitor-argocd
+      - name: Configure kubeconfig
+        run: |
+          NGROK_URL=$(cat ngrok_url.txt)
+          kubectl config set-cluster minikube --server=$NGROK_URL
+          kubectl config set-credentials minikube --token=$MINIKUBE_TOKEN
+          kubectl config set-context minikube --cluster=minikube --user=minikube
+          kubectl config use-context minikube
 
-    - name: Set up Helm
-      uses: azure/setup-helm@v3
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME_JAIME }}/monitor-argocd:latest .
 
-    - name: Deploy to Kubernetes
-      run: |
-        helm upgrade --install monitor-argocd charts/monitor-argocd --namespace poc --create-namespace --debug --kubeconfig=$(pwd)/kubeconfig --insecure-skip-tls-verify
+      - name: Push Docker image
+        run: |
+          echo ${{ secrets.DOCKER_PASSWORD_JAIME }} | docker login -u ${{ secrets.DOCKER_USERNAME_JAIME }} --password-stdin
+          docker push ${{ secrets.DOCKER_USERNAME_JAIME }}/monitor-argocd:latest
+
+      - name: Deploy with Helm
+        run: helm upgrade --install monitor-argocd charts/monitor-argocd --namespace poc --create-namespace
